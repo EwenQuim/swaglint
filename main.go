@@ -60,6 +60,11 @@ func run(pass *analysis.Pass) (any, error) {
 			return true
 		}
 
+		// no return value
+		if funcDecl.Type.Results != nil {
+			return true
+		}
+
 		// Verify that there are comz
 		if funcDecl.Doc == nil {
 			pass.Reportf(node.Pos(), "should have a swagger documentation")
