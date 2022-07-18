@@ -71,17 +71,34 @@ func run(pass *analysis.Pass) (any, error) {
 			return false
 		}
 
+		requiredFields := map[string]bool{
+			"@Summary": false,
+			"@Tags":    false,
+			"@Router":  false,
+		}
 		for _, line := range funcDecl.Doc.List {
-			if strings.Contains(line.Text, "@Router") {
-				return true
+			for field := range requiredFields {
+				if strings.Contains(line.Text, field) {
+					requiredFields[field] = true
+				}
 			}
 		}
-		pass.Reportf(node.Pos(), "no @Router tag found")
-		return true
+
+		return allFieldsFilled(pass, node, requiredFields)
 	}
 
 	for _, f := range pass.Files {
 		ast.Inspect(f, inspect)
 	}
 	return nil, nil
+}
+
+func allFieldsFilled(pass *analysis.Pass, node ast.Node, m map[string]bool) bool {
+	for k, v := range m {
+		if !v {
+			pass.Reportf(node.Pos(), "no %s tag found", k)
+			return false
+		}
+	}
+	return true
 }
