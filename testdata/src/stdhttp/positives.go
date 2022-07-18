@@ -1,6 +1,8 @@
-package p
+package stdhttp
 
-import "net/http"
+import (
+	"net/http"
+)
 
 func _(w http.ResponseWriter, r *http.Request) { // want "should have a swagger documentation"
 	w.Write([]byte("Hello, world!"))

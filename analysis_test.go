@@ -17,5 +17,5 @@ func TestAll(t *testing.T) {
 	t.Log("wd:", wd)
 
 	testdata := filepath.Join(wd, "testdata")
-	analysistest.Run(t, testdata, Analyzer, "p")
+	analysistest.Run(t, testdata, Analyzer, "stdhttp")
 }
