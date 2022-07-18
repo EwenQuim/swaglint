@@ -7,6 +7,13 @@ func notDocumented(w http.ResponseWriter, r *http.Request) { // want "should hav
 }
 
 // Hello, world!
-func documented(w http.ResponseWriter, r *http.Request) {
+// not documented the right way
+func documented(w http.ResponseWriter, r *http.Request) { // want "no @Router tag found"
+	w.Write([]byte("Hello, world!"))
+}
+
+// Hello, world!
+// @Router /hello [get]
+func documentedWithSwaggerRouter(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello, world!"))
 }

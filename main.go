@@ -2,6 +2,7 @@ package main
 
 import (
 	"go/ast"
+	"strings"
 
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/singlechecker"
@@ -17,7 +18,7 @@ func main() {
 	singlechecker.Main(Analyzer)
 }
 
-func run(pass *analysis.Pass) (interface{}, error) {
+func run(pass *analysis.Pass) (any, error) {
 	inspect := func(node ast.Node) bool {
 		funcDecl, ok := node.(*ast.FuncDecl)
 		if !ok {
@@ -60,11 +61,17 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		}
 
 		// Verify that there are comz
-		if funcDecl.Doc != nil {
-			return true
+		if funcDecl.Doc == nil {
+			pass.Reportf(node.Pos(), "should have a swagger documentation")
+			return false
 		}
 
-		pass.Reportf(node.Pos(), "should have a swagger documentation")
+		for _, line := range funcDecl.Doc.List {
+			if strings.Contains(line.Text, "@Router") {
+				return true
+			}
+		}
+		pass.Reportf(node.Pos(), "no @Router tag found")
 		return true
 	}
 
