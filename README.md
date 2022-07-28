@@ -40,10 +40,16 @@ func helloWorld(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-## Installation
+## Installation & Usage
 
 ```bash
 go install github.com/EwenQuim/swaglint
+
+swaglint ./...
+
+swaglint package-name
+
+swaglint -h
 ```
 
 ## Roadmap
@@ -58,4 +64,11 @@ go install github.com/EwenQuim/swaglint
   - [ ] Type mismatch in response
 - [ ] Support for swaggo/swag (parse the comments section with swaggo's internal parser)
 - [ ] Support for go-swagger/go-swagger
+- [ ] Support for frameworks
+  - [ ] ⏳ Support for net/http
+  - [ ] ⏳ Support for chi
+  - [ ] Support for gin
+  - [ ] Support for gorilla/mux
+  - [ ] Support for echo
+  - [ ] Support for fiber
 - [ ] Support for more types of swagger documentation
