@@ -36,6 +36,8 @@ func run(pass *analysis.Pass) (any, error) {
 			return false
 		}
 
+		checkWrongQueryParams(pass, funcDecl)
+
 		return true
 	}
 

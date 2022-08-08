@@ -36,8 +36,8 @@ func isHTTPHandler(node ast.Node) (*ast.FuncDecl, bool) {
 	if !ok {
 		return nil, false
 	}
-	secondParamdzqid, ok := secondParam.X.(*ast.Ident)
-	if !ok || secondParamdzqid.Name != "http" {
+	secondParamAfterStar, ok := secondParam.X.(*ast.Ident)
+	if !ok || secondParamAfterStar.Name != "http" {
 		return nil, false
 	}
 	if secondParam.Sel.Name != "Request" {
