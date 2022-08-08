@@ -20,85 +20,27 @@ func main() {
 
 func run(pass *analysis.Pass) (any, error) {
 	inspect := func(node ast.Node) bool {
-		funcDecl, ok := node.(*ast.FuncDecl)
+		funcDecl, ok := isHTTPHandler(node)
 		if !ok {
 			return true
 		}
 
-		params := funcDecl.Type.Params.List
-		if len(params) != 2 { // [0] must be format (string), [1] must be args (...interface{})
-			return true
-		}
-
-		// http.ResponseWriter
-		firstParamType, ok := params[0].Type.(*ast.SelectorExpr)
-		if !ok { // first param type isn't identificator so it can't be of type "string"
-			return true
-		}
-		forstParamLib, ok := firstParamType.X.(*ast.Ident)
-		if !ok || forstParamLib.Name != "http" {
-			return true
-		}
-		if firstParamType.Sel.Name != "ResponseWriter" {
-			return true
-		}
-
-		// *http.Request
-		secondParamType, ok := params[1].Type.(*ast.StarExpr)
-		if !ok {
-			return true
-		}
-		secondParam, ok := secondParamType.X.(*ast.SelectorExpr)
-		if !ok {
-			return true
-		}
-		secondParamdzqid, ok := secondParam.X.(*ast.Ident)
-		if !ok || secondParamdzqid.Name != "http" {
-			return true
-		}
-		if secondParam.Sel.Name != "Request" {
-			return true
-		}
-
-		// no return value
-		if funcDecl.Type.Results != nil {
-			return true
-		}
-
-		// Verify that there are comz
-		if funcDecl.Doc == nil {
+		if !checkDocExists(funcDecl) {
 			pass.Reportf(node.Pos(), "should have a swagger documentation")
 			return false
 		}
 
-		requiredFields := map[string]bool{
-			"@Summary": false,
-			"@Tags":    false,
-			"@Router":  false,
-		}
-		for _, line := range funcDecl.Doc.List {
-			for field := range requiredFields {
-				if strings.Contains(line.Text, field) {
-					requiredFields[field] = true
-				}
-			}
+		missingTags := checkMissingTags(funcDecl)
+		if len(missingTags) > 0 {
+			pass.Reportf(node.Pos(), "should have the following tags: %s", strings.Join(missingTags, ", "))
+			return false
 		}
 
-		return allFieldsFilled(pass, node, requiredFields)
+		return true
 	}
 
 	for _, f := range pass.Files {
 		ast.Inspect(f, inspect)
 	}
 	return nil, nil
-}
-
-func allFieldsFilled(pass *analysis.Pass, node ast.Node, m map[string]bool) bool {
-	for k, v := range m {
-		if !v {
-			pass.Reportf(node.Pos(), "no %s tag found", k)
-			return false
-		}
-	}
-	return true
 }
