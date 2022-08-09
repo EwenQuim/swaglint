@@ -1,4 +1,4 @@
-package main
+package analyzer
 
 import (
 	"fmt"
@@ -6,7 +6,9 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/EwenQuim/swaglint/utils"
+	chianalyzer "github.com/EwenQuim/swaglint/analyzer/chi"
+	"github.com/EwenQuim/swaglint/analyzer/stdhttp"
+	"github.com/EwenQuim/swaglint/analyzer/utils"
 	"golang.org/x/exp/slices"
 	"golang.org/x/tools/go/analysis"
 )
@@ -40,17 +42,33 @@ func checkMissingTags(funcDecl *ast.FuncDecl) []string {
 }
 
 func checkWrongQueryParams(pass *analysis.Pass, funcDecl *ast.FuncDecl) {
-	paramsFromCode := utils.GetParamsFromFunctionBody(funcDecl.Body)
-	paramsFromDocs := utils.GetParamsFromDoc(funcDecl.Doc)
+	paramsFromCode := stdhttp.GetParamsFromFunctionBody(funcDecl.Body)
+	paramsFromDocs := utils.GetParamsFromDoc(funcDecl.Doc, utils.ParamTypeQuery)
 
 	for _, param := range paramsFromCode {
 		if !slices.Contains(paramsFromDocs, param) {
-			pass.Reportf(funcDecl.Pos(), "%s is in code but not in docs", param)
+			pass.Reportf(funcDecl.Pos(), "'%s' query param is in code but not in docs", param)
 		}
 	}
 	for _, param := range paramsFromDocs {
 		if !slices.Contains(paramsFromCode, param) {
-			pass.Reportf(funcDecl.Pos(), "%s is in docs but not in code", param)
+			pass.Reportf(funcDecl.Pos(), "'%s' query param is in docs but not in code", param)
+		}
+	}
+}
+
+func checkWrongPathParams(pass *analysis.Pass, funcDecl *ast.FuncDecl) {
+	paramsFromCode := chianalyzer.GetPathParamsFromFunctionBody(funcDecl.Body)
+	paramsFromDocs := utils.GetParamsFromDoc(funcDecl.Doc, utils.ParamTypePath)
+
+	for _, param := range paramsFromCode {
+		if !slices.Contains(paramsFromDocs, param) {
+			pass.Reportf(funcDecl.Pos(), "'%s' path param is in code but not in docs", param)
+		}
+	}
+	for _, param := range paramsFromDocs {
+		if !slices.Contains(paramsFromCode, param) {
+			pass.Reportf(funcDecl.Pos(), "'%s' path param is in docs but not in code", param)
 		}
 	}
 }

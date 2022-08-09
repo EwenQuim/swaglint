@@ -34,7 +34,7 @@ func _(w http.ResponseWriter, r *http.Request) { // want "should have the follow
 // @Summary Hello, world!
 // @Tags user
 // @Router /hello [get]
-func _(w http.ResponseWriter, r *http.Request) { // want "clientID is in code but not in docs"
+func _(w http.ResponseWriter, r *http.Request) { // want "'clientID' query param is in code but not in docs"
 	clientID := r.FormValue("clientID")
 	json.NewEncoder(w).Encode(clientID)
 }
@@ -43,6 +43,6 @@ func _(w http.ResponseWriter, r *http.Request) { // want "clientID is in code bu
 // @Tags user
 // @Param clientID query string true "Client ID"
 // @Router /hello [get]
-func _(w http.ResponseWriter, r *http.Request) { // want "clientID is in docs but not in code"
+func _(w http.ResponseWriter, r *http.Request) { // want "'clientID' query param is in docs but not in code"
 	w.Write([]byte("Hello, world!"))
 }

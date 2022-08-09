@@ -1,9 +1,9 @@
-package main
+package stdhttp
 
 import "go/ast"
 
 // isHTTPHandler returns true if the given node is a func declaration
-func isHTTPHandler(node ast.Node) (*ast.FuncDecl, bool) {
+func IsHTTPHandler(node ast.Node) (*ast.FuncDecl, bool) {
 	funcDecl, ok := node.(*ast.FuncDecl)
 	if !ok {
 		return nil, false

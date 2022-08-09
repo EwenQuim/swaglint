@@ -1,4 +1,4 @@
-package main
+package analyzer
 
 import (
 	"os"
@@ -17,5 +17,5 @@ func TestAll(t *testing.T) {
 	t.Log("wd:", wd)
 
 	testdata := filepath.Join(wd, "testdata")
-	analysistest.Run(t, testdata, Analyzer, "stdhttp")
+	analysistest.Run(t, testdata, Analyzer, "stdhttp", "chi")
 }
