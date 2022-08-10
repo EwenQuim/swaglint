@@ -3,7 +3,6 @@ module github.com/EwenQuim/swaglint
 go 1.18
 
 require (
-	github.com/go-chi/chi/v5 v5.0.7
 	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e
 	golang.org/x/tools v0.1.11
 )
