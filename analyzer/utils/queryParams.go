@@ -2,7 +2,7 @@ package utils
 
 import (
 	"go/ast"
-	"strings"
+	"regexp"
 )
 
 type ParamType string
@@ -16,30 +16,15 @@ const (
 
 func GetParamsFromDoc(docs *ast.CommentGroup, paramType ParamType) []string {
 	paramsFromDocs := make([]string, 0, len(docs.List))
+	regexp := regexp.MustCompile(`@Param\s+(\w+)\s+` + string(paramType))
 
 	for _, line := range docs.List {
-		if !strings.Contains(line.Text, "@Param") {
-			continue
+
+		matches := regexp.FindStringSubmatch(line.Text)
+		if len(matches) > 1 {
+			paramsFromDocs = append(paramsFromDocs, matches[1])
 		}
-		if !strings.Contains(line.Text, string(paramType)) {
-			continue
-		}
-		words := removeEmpty(strings.Split(line.Text, " "))
-		if len(words) < 3 {
-			continue
-		}
-		paramsFromDocs = append(paramsFromDocs, words[2])
 
 	}
 	return paramsFromDocs
-}
-
-func removeEmpty(s []string) []string {
-	var r []string
-	for _, v := range s {
-		if v != "" {
-			r = append(r, v)
-		}
-	}
-	return r
 }

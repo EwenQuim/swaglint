@@ -18,24 +18,32 @@ func checkDocExists(funcDecl *ast.FuncDecl) bool {
 }
 
 func checkMissingTags(funcDecl *ast.FuncDecl) []string {
-	tags := map[string]bool{
-		"@Router":  false,
-		"@Summary": false,
-		"@Tags":    false,
+	type tag struct {
+		name    string
+		present bool
 	}
 
+	tags := []tag{
+		{name: "@Router", present: false},
+		{name: "@Summary", present: false},
+		{name: "@Tags", present: false},
+	}
+
+	var commentBlock string
 	for _, line := range funcDecl.Doc.List {
-		for field := range tags {
-			if strings.Contains(line.Text, field) {
-				tags[field] = true
-			}
+		commentBlock += line.Text
+	}
+
+	for index, tag := range tags {
+		if strings.Contains(commentBlock, tag.name) {
+			tags[index].present = true
 		}
 	}
 
 	missing := make([]string, 0, len(tags))
-	for k, v := range tags {
-		if !v {
-			missing = append(missing, k)
+	for _, tag := range tags {
+		if !tag.present {
+			missing = append(missing, tag.name)
 		}
 	}
 	return missing
